@@ -12,7 +12,8 @@ export default defineConfig({
   preview: {
     host: "0.0.0.0",
     port: Number(process.env.PORT || 4174),
-    strictPort: true
+    strictPort: true,
+    allowedHosts: true
   },
   plugins: [
     react(),
