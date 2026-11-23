@@ -127,7 +127,7 @@ No key is required to open the pages. YouTube research does nothing useful witho
 
 On this computer the database is the local SQLite file. Set `TURSO_DATABASE_URL` and `TURSO_AUTH_TOKEN`, then run `npm run db:push`, to copy that file into Turso. Do not paste the token into the command.
 
-The free host is a Render web service in Frankfurt, from `render.yaml` and the `Dockerfile`. The free instance sleeps, and it does not keep a database file, so the live database is Turso. The steps are in [docs/deploy.md](docs/deploy.md). The first visit after a sleep shows "Waking up, wait 1 minute."
+The free host is a Render web service in Frankfurt, from `render.yaml` and the `Dockerfile`. The live site is https://counter-notes-manager.onrender.com . The free instance sleeps, and it does not keep a database file, so the live database is Turso. The steps are in [docs/deploy.md](docs/deploy.md). The first visit after a sleep shows "Waking up, wait 1 minute."
 
 ## Limits
 
