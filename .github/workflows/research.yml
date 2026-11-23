@@ -53,10 +53,9 @@ jobs:
           except Exception:
               print("Research: fail")
               sys.exit(1)
-          if started.get("started") is False and started.get("running"):
-              print("Research: pass")
-          else:
-              print("Research: pass")
+          if not (started.get("started") or started.get("running")):
+              print("Research: fail")
+              sys.exit(1)
           for _ in range(60):
               try:
                   status = call("/api/research/status")

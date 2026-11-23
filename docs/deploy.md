@@ -18,7 +18,7 @@ Leave `TURSO_DATABASE_URL` empty on this computer and the app uses the local fil
 
 ## What runs in the background
 
-Python does not start a daily job. The GitHub Action at 08:15 UTC wakes the host, tries up to 3 times, waits 30 seconds between tries, and calls `POST /api/research/run` once. A failed try prints which attempt failed. The research code still stops before the YouTube quota reserve. The Run research button on Today does the same job after the host is awake.
+Python does not start a daily job. The GitHub Action at 08:15 UTC wakes the host, tries up to 3 times, waits 30 seconds between tries, and calls `POST /api/research/run` once. The log prints Wake, Research, and Backup as pass or fail, plus a topic count and a backup size. It does not print topic names, channel ids, notes, quota numbers, or the site address. The research code still stops before the YouTube quota reserve. The Run research button on Today does the same job after the host is awake.
 
 ## 1. Password
 

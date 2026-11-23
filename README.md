@@ -120,8 +120,9 @@ Put values in a file named `.env` in this folder. That file is gitignored. Do no
 - `COUNTER_NOTES_DB`
 - `TURSO_DATABASE_URL`
 - `TURSO_AUTH_TOKEN`
+- `BACKUP_KEY`
 
-No key is required to open the pages. YouTube research does nothing useful without `YOUTUBE_API_KEY`. FRED and Pexels are optional. `COUNTER_NOTES_EMBEDDINGS=1` turns on an extra model that is not installed by default.
+The pages open after the password. YouTube research does nothing useful without `YOUTUBE_API_KEY`. FRED and Pexels are optional. `COUNTER_NOTES_EMBEDDINGS=1` turns on an extra model that is not installed by default. `BACKUP_KEY` is only for decrypting the daily backup.
 
 ## Hosting
 
@@ -129,7 +130,9 @@ On this computer the database is the local SQLite file. Set `TURSO_DATABASE_URL`
 
 The free host is a Render web service in Frankfurt, from `render.yaml` and the `Dockerfile`. The free instance sleeps, and it does not keep a database file, so the live database is Turso. The steps are in [docs/deploy.md](docs/deploy.md). The first visit after a sleep shows "Waking up, wait 1 minute."
 
-Live demo: the link is added after the demo service answers. It uses sample data, asks for no password, and does not save changes.
+Live demo: https://counter-notes-demo.onrender.com
+
+The demo uses sample data, asks for no password, and does not save changes. The real site address stays out of this file.
 
 ## Limits
 
