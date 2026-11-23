@@ -3,7 +3,7 @@ import { dirname, join } from "node:path";
 import { writeBackup } from "./backup.js";
 import { database, databaseFile, addStat, checkPastedLink, ignoreWinner, importBrowserTools, importLocal, logEvent, readState, researchJob, restoreWinner, reviewFinding, saveSplit, setCadence, setDay, setFactCheck, setFindingUrl, setNiche, setNumbersInputs, setPerformance, setQueue, setStatus, setVideoSettings, setWeights, startResearch } from "./db.js";
 import { copy } from "../src/copy.js";
-import { clientPlace, reviewLogin } from "./login-limit.js";
+import { reviewLogin } from "./login-limit.js";
 import { loadPasscode, researchHeaders } from "./passcode.js";
 
 function plainRow(row) {
@@ -43,7 +43,7 @@ export async function handleApi(req, res) {
   const method = req.method || "GET";
   if (!demo) {
     const decision = reviewLogin({
-      place: clientPlace(req.headers, req.socket?.remoteAddress),
+      place: "site",
       header: req.headers["x-counter-notes-passcode"],
       expected: loadPasscode()
     });

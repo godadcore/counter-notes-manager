@@ -144,7 +144,7 @@ The demo uses sample data, asks for no password, and does not save changes. The 
 - YouTube quota is capped. The job stops before the last reserve is spent.
 - Videos under 3 minutes are left out of the scores.
 - A number stays "check this" until you mark it confirmed.
-- The real site asks for a password on this computer and on a phone. If `COUNTER_NOTES_PASSCODE` is empty, the API refuses every request. Five wrong passwords from one place in 10 minutes block that place for 15 minutes. The block ends by itself.
+- The real site asks for a password on this computer and on a phone. If `COUNTER_NOTES_PASSCODE` is empty, the API refuses every request. Five wrong passwords in 10 minutes block the site for 15 minutes. The block ends by itself. A restart of the site clears it too.
 - Demo mode (`COUNTER_NOTES_DEMO=1`) opens without a password, uses the sample channel, and refuses saves. It does not start research.
 
 ## Roadmap
