@@ -10,8 +10,9 @@ export function resetLoginLimits() {
 
 export function clientPlace(headers = {}, socketAddress = "") {
   const forwarded = String(headers["x-forwarded-for"] || "");
-  const first = forwarded.split(",").map((item) => item.trim()).filter(Boolean)[0];
-  return String(first || socketAddress || "unknown").replace(/^::ffff:/i, "");
+  const hops = forwarded.split(",").map((item) => item.trim()).filter(Boolean);
+  const last = hops[hops.length - 1];
+  return String(last || socketAddress || "unknown").replace(/^::ffff:/i, "");
 }
 
 export function reviewLogin({ place, header, expected, now = Date.now(), store = buckets }) {

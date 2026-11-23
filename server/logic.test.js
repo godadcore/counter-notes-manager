@@ -3,7 +3,7 @@ import test from "node:test";
 import { importLocal, openDatabase, readState, saveSplit, setFindingUrl, setStatus } from "./db.js";
 import { findingsForTopic, readyBlockReason } from "./numbers.js";
 import { allowsPasscode } from "./passcode.js";
-import { BLOCK_MS, FAIL_WINDOW_MS, resetLoginLimits, reviewLogin } from "./login-limit.js";
+import { BLOCK_MS, FAIL_WINDOW_MS, clientPlace, resetLoginLimits, reviewLogin } from "./login-limit.js";
 import { topicsFromBlueprint } from "./seed.js";
 import { isUnverified } from "../src/status.js";
 
@@ -99,6 +99,8 @@ test("five wrong passwords block one place for 15 minutes, then the right passwo
   assert.equal(again.status, 401);
   const blank = reviewLogin({ place: "203.0.113.8", header: "", expected: "secret", now: start });
   assert.equal(blank.status, 401);
+  assert.equal(clientPlace({ "x-forwarded-for": "203.0.113.50, 198.51.100.10" }, "127.0.0.1"), "198.51.100.10");
+  assert.equal(clientPlace({}, "::ffff:127.0.0.1"), "127.0.0.1");
 });
 
 test("a series is stored and a single video stores no parts", async () => {
