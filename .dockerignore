@@ -3,7 +3,8 @@
 .env.*
 node_modules
 ml/.venv
-data
+data/*
+!data/sample-demo.json
 docs/audit
 dist
 *.sqlite
