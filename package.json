@@ -1,0 +1,34 @@
+{
+  "name": "counter-notes-manager",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "node --disable-warning=ExperimentalWarning --test server/logic.test.js src/engine/engine.test.js src/engine/series.test.js src/engine/videoPrompt.test.js src/engine/proofTitle.test.js",
+    "research": "node scripts/start-research.mjs",
+    "start": "node scripts/start.mjs",
+    "dev:all": "node scripts/free-ports.mjs && concurrently -k -n web,research \"npm run dev\" \"npm run research\"",
+    "db:push": "node scripts/db-push.mjs",
+    "check:ui": "node scripts/check-ui.mjs",
+    "audit:site": "node scripts/audit-site.mjs"
+  },
+  "dependencies": {
+    "@fontsource/jetbrains-mono": "^5.2.6",
+    "@fontsource/plus-jakarta-sans": "^5.2.6",
+    "@libsql/client": "^0.18.0",
+    "lucide-react": "^0.511.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.5.2",
+    "concurrently": "^10.0.7",
+    "playwright": "^1.65.1",
+    "sharp": "^0.34.2",
+    "vite": "^6.3.5",
+    "vite-plugin-pwa": "^1.0.0"
+  }
+}

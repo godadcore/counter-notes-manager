@@ -1,0 +1,97 @@
+name: Daily research
+
+on:
+  schedule:
+    - cron: "15 8 * * *"
+  workflow_dispatch:
+
+jobs:
+  research:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wake the host and run research once
+        env:
+          SITE: ${{ secrets.COUNTER_NOTES_URL }}
+          PASS: ${{ secrets.COUNTER_NOTES_PASSCODE }}
+        run: |
+          set -u
+          if [ -z "${SITE}" ] || [ -z "${PASS}" ]; then
+            echo "COUNTER_NOTES_URL or COUNTER_NOTES_PASSCODE is missing. Nothing ran."
+            exit 1
+          fi
+          woke=0
+          for attempt in 1 2 3; do
+            echo "Wake attempt ${attempt} of 3."
+            if curl --fail --silent --show-error --max-time 70 "${SITE}/" >/dev/null; then
+              woke=1
+              break
+            fi
+            echo "The host did not answer on attempt ${attempt}."
+            if [ "${attempt}" != "3" ]; then
+              echo "Waiting 30 seconds before the next try."
+              sleep 30
+            fi
+          done
+          if [ "${woke}" != "1" ]; then
+            echo "The host did not wake after 3 tries."
+            exit 1
+          fi
+          python3 - <<'PY'
+          import json, os, sys, time, urllib.request
+          site = os.environ["SITE"].rstrip("/")
+          password = os.environ["PASS"]
+
+          def call(path, method="GET", payload=None):
+              data = None if payload is None else json.dumps(payload).encode()
+              request = urllib.request.Request(site + path, data=data, method=method, headers={
+                  "content-type": "application/json",
+                  "x-counter-notes-passcode": password,
+              })
+              with urllib.request.urlopen(request, timeout=30) as response:
+                  return json.loads(response.read().decode())
+
+          try:
+              started = call("/api/research/run", "POST", {})
+          except Exception as exc:
+              print("Research did not start.")
+              print(str(exc)[:300])
+              sys.exit(1)
+          if started.get("started") is False and started.get("running"):
+              print("A research job was already running. Waiting for it.")
+          else:
+              print("Research started.")
+          for _ in range(60):
+              status = call("/api/research/status")
+              name = str(status.get("topicName") or "")
+              if status.get("running"):
+                  print("Research is running." + ((" On " + name + ".") if name else ""))
+                  time.sleep(15)
+                  continue
+              if status.get("error"):
+                  print("Research failed.")
+                  print(str(status.get("error"))[:500])
+                  sys.exit(1)
+              if status.get("done"):
+                  print("Research finished. Topics: " + str(status.get("topics")))
+                  sys.exit(0)
+              print("Research did not report a result.")
+              sys.exit(1)
+          print("Research was still running after 15 minutes.")
+          sys.exit(1)
+          PY
+      - name: Save a database backup
+        env:
+          SITE: ${{ secrets.COUNTER_NOTES_URL }}
+          PASS: ${{ secrets.COUNTER_NOTES_PASSCODE }}
+        run: |
+          set -u
+          curl --fail --silent --show-error --max-time 120 \
+            -H "x-counter-notes-passcode: ${PASS}" \
+            -o counter-notes.sqlite \
+            "${SITE}/api/backup"
+          echo "Backup downloaded."
+      - uses: actions/upload-artifact@v4
+        with:
+          name: counter-notes-backup
+          path: counter-notes.sqlite
+          retention-days: 7

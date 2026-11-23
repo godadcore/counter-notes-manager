@@ -1,0 +1,14 @@
+.git
+.env
+.env.*
+node_modules
+ml/.venv
+data
+docs/audit
+dist
+*.sqlite
+__pycache__
+**/__pycache__
+*.pyc
+.DS_Store
+Thumbs.db

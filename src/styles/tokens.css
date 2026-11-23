@@ -1,0 +1,63 @@
+:root {
+  --bg: #0F0F0F;
+  --surface: #181818;
+  --surface-2: #222222;
+  --text: #FFFFFF;
+  --red: #E10600;
+  --ok: #3DDC97;
+  --line: rgba(255, 255, 255, 0.16);
+  --muted: #C8C8C8;
+  --shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-pill: 999px;
+
+  --border: 1px solid var(--line);
+  --divider: 1px solid var(--line);
+
+  --text-sm: 14px;
+  --text-md: 16px;
+  --text-lg: 20px;
+  --text-xl: 24px;
+  --text-2xl: 32px;
+  --line-body: 1.5;
+  --line-heading: 1.25;
+
+  --sans: "Plus Jakarta Sans", "Segoe UI", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, monospace;
+
+  --gutter: 16px;
+  --page-top: 24px;
+  --page-bottom: 48px;
+  --section-gap: 32px;
+  --card-gap: 24px;
+  --card-pad: 16px;
+  --content: 720px;
+  --control: 44px;
+  --header: 56px;
+}
+
+@media (min-width: 600px) {
+  :root { --gutter: 24px; }
+}
+
+@media (min-width: 900px) {
+  :root {
+    --gutter: 32px;
+    --page-top: 32px;
+    --section-gap: 48px;
+    --card-gap: 32px;
+    --card-pad: 24px;
+  }
+}

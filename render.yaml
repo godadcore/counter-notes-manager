@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: counter-notes-manager
+    runtime: docker
+    region: frankfurt
+    plan: free
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /
+    envVars:
+      - key: COUNTER_NOTES_PASSCODE
+        sync: false
+      - key: YOUTUBE_API_KEY
+        sync: false
+      - key: TURSO_DATABASE_URL
+        sync: false
+      - key: TURSO_AUTH_TOKEN
+        sync: false
