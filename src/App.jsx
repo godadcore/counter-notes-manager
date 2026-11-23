@@ -336,11 +336,13 @@ function Blocked({ problem, setPasscode }) {
       </div>
     );
   }
+  const locked = problem.code === "LOCKED";
+  const needsPassword = problem.code === "PASSCODE" || locked;
   return (
     <div className="page">
-      <h1>{problem.code === "PASSCODE" ? copy.passcodeTitle : copy.offlineTitle}</h1>
-      <p>{problem.message}</p>
-      {problem.code === "PASSCODE" ? (
+      <h1>{locked ? copy.lockedTitle : problem.code === "PASSCODE" ? copy.passcodeTitle : copy.offlineTitle}</h1>
+      <p>{locked ? copy.locked : problem.message}</p>
+      {needsPassword ? (
         <>
           <Field id="passcode" label={copy.passcode} hint={copy.passcodeHint}>
             <Input id="passcode" type="password" value={value} onChange={(event) => setValue(event.target.value)} />

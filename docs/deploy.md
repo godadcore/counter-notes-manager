@@ -14,7 +14,7 @@ Turso is the free database for this app. The Node API uses `@libsql/client` for 
 
 Leave `TURSO_DATABASE_URL` empty on this computer and the app uses the local file. Set `TURSO_DATABASE_URL` and `TURSO_AUTH_TOKEN` and the same code uses Turso. That connection was opened: a test row was written and deleted, `npm run db:push` copied 16 tables, and the table counts matched. One research run then added rows on Turso only. You copy the local file yourself with `npm run db:push`. Do not paste the token into the command.
 
-`GET /api/backup` writes a fresh SQLite copy and downloads it. The request must send the password. The GitHub Action saves that file for 7 days. That backup is a spare copy. It is not the live database.
+`GET /api/backup` writes a fresh SQLite copy and downloads it. The request must send the password. The GitHub Action encrypts that copy before upload. See [backup.md](backup.md). The encrypted file is a spare. It is not the live database.
 
 ## What runs in the background
 
@@ -65,3 +65,7 @@ Render's free Python install may be Python 3.11 or 3.12. The research code uses 
 - Free hosts have no durable disk. A SQLite file written on Render disappears. Do not treat the host disk as the database.
 - The free instance has 512 MB of RAM. During a real 4-topic research run on this computer, the preview process peaked at 99.7 MB and the Python process peaked at 270.9 MB. Those separate peaks add to 370.6 MB, under 450 MB. If Render kills the process, the page should still open and research should say it is off after the health check returns.
 - Windows paths are not used by `npm start`. It picks `ml/.venv/bin/python` on Linux and `ml/.venv/Scripts/python.exe` on Windows.
+
+## Keep the daily job switched on
+
+GitHub turns off scheduled Actions in a public repository after 60 days with no activity in the repo. A push, or running the Daily research workflow by hand, counts as activity. Do one of those at least every 60 days. The schedule cannot wake itself after GitHub has switched it off.

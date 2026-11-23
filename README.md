@@ -127,7 +127,9 @@ No key is required to open the pages. YouTube research does nothing useful witho
 
 On this computer the database is the local SQLite file. Set `TURSO_DATABASE_URL` and `TURSO_AUTH_TOKEN`, then run `npm run db:push`, to copy that file into Turso. Do not paste the token into the command.
 
-The free host is a Render web service in Frankfurt, from `render.yaml` and the `Dockerfile`. The live site is https://counter-notes-manager.onrender.com . The free instance sleeps, and it does not keep a database file, so the live database is Turso. The steps are in [docs/deploy.md](docs/deploy.md). The first visit after a sleep shows "Waking up, wait 1 minute."
+The free host is a Render web service in Frankfurt, from `render.yaml` and the `Dockerfile`. The free instance sleeps, and it does not keep a database file, so the live database is Turso. The steps are in [docs/deploy.md](docs/deploy.md). The first visit after a sleep shows "Waking up, wait 1 minute."
+
+Live demo: the link is added after the demo service answers. It uses sample data, asks for no password, and does not save changes.
 
 ## Limits
 
@@ -139,11 +141,12 @@ The free host is a Render web service in Frankfurt, from `render.yaml` and the `
 - YouTube quota is capped. The job stops before the last reserve is spent.
 - Videos under 3 minutes are left out of the scores.
 - A number stays "check this" until you mark it confirmed.
-- The password is required on this computer and on a phone. If `COUNTER_NOTES_PASSCODE` is empty, the API refuses every request.
+- The real site asks for a password on this computer and on a phone. If `COUNTER_NOTES_PASSCODE` is empty, the API refuses every request. Five wrong passwords from one place in 10 minutes block that place for 15 minutes. The block ends by itself.
+- Demo mode (`COUNTER_NOTES_DEMO=1`) opens without a password, uses the sample channel, and refuses saves. It does not start research.
 
 ## Roadmap
 
-- The Turso connection is in the app. A test row, a 16-table copy, matching counts, and one research run were measured against it. The backup download still writes a SQLite file.
+- The Turso connection is in the app. A test row, a 16-table copy, matching counts, and one research run were measured against it. The backup download still writes a SQLite file. The daily Action encrypts its copy before upload. See [docs/backup.md](docs/backup.md).
 - A 4-topic research run on this computer peaked at 99.7 MB for the site process and 270.9 MB for Python. Those peaks add to 370.6 MB, under the 512 MB free-host limit.
 - The free host still sleeps. A paid instance that stays awake is not set up.
 - The app still does not upload a video or write the script.

@@ -10,6 +10,7 @@ export function databasePath() {
 }
 
 export function databaseUrl() {
+  if (process.env.COUNTER_NOTES_DEMO === "1") return pathToFileURL(databasePath()).href;
   const remote = String(process.env.TURSO_DATABASE_URL || "").trim();
   if (remote) return remote;
   return pathToFileURL(databasePath()).href;

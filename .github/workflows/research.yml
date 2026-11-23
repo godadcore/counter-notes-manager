@@ -9,33 +9,31 @@ jobs:
   research:
     runs-on: ubuntu-latest
     steps:
-      - name: Wake the host and run research once
+      - name: Wake the host
         env:
           SITE: ${{ secrets.COUNTER_NOTES_URL }}
           PASS: ${{ secrets.COUNTER_NOTES_PASSCODE }}
         run: |
           set -u
           if [ -z "${SITE}" ] || [ -z "${PASS}" ]; then
-            echo "COUNTER_NOTES_URL or COUNTER_NOTES_PASSCODE is missing. Nothing ran."
+            echo "Wake: fail"
             exit 1
           fi
           woke=0
           for attempt in 1 2 3; do
-            echo "Wake attempt ${attempt} of 3."
-            if curl --fail --silent --show-error --max-time 70 "${SITE}/" >/dev/null; then
+            if curl --fail --silent --max-time 70 --output /dev/null "${SITE}/"; then
               woke=1
               break
             fi
-            echo "The host did not answer on attempt ${attempt}."
             if [ "${attempt}" != "3" ]; then
-              echo "Waiting 30 seconds before the next try."
               sleep 30
             fi
           done
           if [ "${woke}" != "1" ]; then
-            echo "The host did not wake after 3 tries."
+            echo "Wake: fail"
             exit 1
           fi
+          echo "Wake: pass"
           python3 - <<'PY'
           import json, os, sys, time, urllib.request
           site = os.environ["SITE"].rstrip("/")
@@ -52,46 +50,62 @@ jobs:
 
           try:
               started = call("/api/research/run", "POST", {})
-          except Exception as exc:
-              print("Research did not start.")
-              print(str(exc)[:300])
+          except Exception:
+              print("Research: fail")
               sys.exit(1)
           if started.get("started") is False and started.get("running"):
-              print("A research job was already running. Waiting for it.")
+              print("Research: pass")
           else:
-              print("Research started.")
+              print("Research: pass")
           for _ in range(60):
-              status = call("/api/research/status")
-              name = str(status.get("topicName") or "")
+              try:
+                  status = call("/api/research/status")
+              except Exception:
+                  print("Research: fail")
+                  sys.exit(1)
               if status.get("running"):
-                  print("Research is running." + ((" On " + name + ".") if name else ""))
                   time.sleep(15)
                   continue
               if status.get("error"):
-                  print("Research failed.")
-                  print(str(status.get("error"))[:500])
+                  print("Research: fail")
                   sys.exit(1)
               if status.get("done"):
-                  print("Research finished. Topics: " + str(status.get("topics")))
+                  print("Topics: " + str(status.get("topics") or 0))
+                  print("Research: pass")
                   sys.exit(0)
-              print("Research did not report a result.")
+              print("Research: fail")
               sys.exit(1)
-          print("Research was still running after 15 minutes.")
+          print("Research: fail")
           sys.exit(1)
           PY
-      - name: Save a database backup
+      - name: Save an encrypted backup
         env:
           SITE: ${{ secrets.COUNTER_NOTES_URL }}
           PASS: ${{ secrets.COUNTER_NOTES_PASSCODE }}
+          BACKUP_KEY: ${{ secrets.BACKUP_KEY }}
         run: |
           set -u
-          curl --fail --silent --show-error --max-time 120 \
+          if [ -z "${BACKUP_KEY}" ]; then
+            echo "Backup: fail"
+            exit 1
+          fi
+          if ! curl --fail --silent --max-time 120 \
             -H "x-counter-notes-passcode: ${PASS}" \
             -o counter-notes.sqlite \
-            "${SITE}/api/backup"
-          echo "Backup downloaded."
+            "${SITE}/api/backup"; then
+            echo "Backup: fail"
+            exit 1
+          fi
+          openssl enc -aes-256-cbc -pbkdf2 -iter 200000 -salt \
+            -in counter-notes.sqlite \
+            -out counter-notes.sqlite.enc \
+            -pass env:BACKUP_KEY
+          rm -f counter-notes.sqlite
+          bytes=$(wc -c < counter-notes.sqlite.enc | tr -d ' ')
+          echo "Backup: pass"
+          echo "Bytes: ${bytes}"
       - uses: actions/upload-artifact@v4
         with:
           name: counter-notes-backup
-          path: counter-notes.sqlite
+          path: counter-notes.sqlite.enc
           retention-days: 7

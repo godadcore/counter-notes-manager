@@ -107,7 +107,7 @@ These labels are from the code in this folder, not from old notes.
 - A fresh research run spends YouTube quota. List rebuilds do not. The quota counter is in the SQLite file and is not reset by opening the site.
 - Sentence embeddings stay off unless `COUNTER_NOTES_EMBEDDINGS=1`. The default research install does not download that model.
 - The GitHub Action secrets `COUNTER_NOTES_URL` and `COUNTER_NOTES_PASSCODE` are set. The workflow runs every day and can be started by hand.
-- The host is https://counter-notes-manager.onrender.com in Frankfurt. A browser opened it: the waking line, the password page, Today, Plan, Proof, Setup, a confirm that was put back, an ignore with undo, and the phone drawer. The free instance still sleeps when nobody visits.
+- A free host in Frankfurt serves the real site. The address stays out of this file. The free instance still sleeps when nobody visits. A separate demo service uses sample data only.
 - Turso is the live database when the two Turso variables are set. A test row was written and deleted, `npm run db:push` copied 16 tables, the counts matched, and the live site wrote a row that the same database read back. `GET /api/backup` still downloads a SQLite copy when the password is sent.
 
 ### MISSING

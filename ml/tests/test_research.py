@@ -312,13 +312,13 @@ class ResearchTests(unittest.TestCase):
         def transport(request):
             calls.append(request["kind"])
             if request["kind"] == "youtube.channel":
-                return {"channel_id": "UC1", "channel_title": "Company Man", "uploads": "UU1"}
+                return {"channel_id": "UC1", "channel_title": "Sample Channel", "uploads": "UU1"}
             if request["kind"] == "youtube.playlist":
                 return {"ids": ["a", "b", "c"]}
             return {"videos": [
-                {"video_id": "a", "channel_id": "UC1", "channel_title": "Company Man", "title": "One", "views": 10},
-                {"video_id": "b", "channel_id": "UC1", "channel_title": "Company Man", "title": "Two", "views": 30},
-                {"video_id": "c", "channel_id": "UC1", "channel_title": "Company Man", "title": "Three", "views": 100},
+                {"video_id": "a", "channel_id": "UC1", "channel_title": "Sample Channel", "title": "One", "views": 10},
+                {"video_id": "b", "channel_id": "UC1", "channel_title": "Sample Channel", "title": "Two", "views": 30},
+                {"video_id": "c", "channel_id": "UC1", "channel_title": "Sample Channel", "title": "Three", "views": 100},
             ]}
 
         videos, stopped = collect_channel_uploads([{"channel_id": "UC1"}], quota, transport, {})
@@ -644,11 +644,11 @@ class ResearchTests(unittest.TestCase):
         self.assertIn("You should cover the store count.", joined)
         self.assertIn("too long", joined.lower())
         same = same_topic_videos([
-            {"video_id": "s1", "title": "The Decline of Subway...What Happened?", "channel_title": "Company Man", "views": 20, "published_at": "2024-01-02T00:00:00Z"},
+            {"video_id": "s1", "title": "The Decline of Subway...What Happened?", "channel_title": "Sample Channel", "views": 20, "published_at": "2024-01-02T00:00:00Z"},
             {"video_id": "s2", "title": "A train timetable", "views": 99},
         ], "Subway")
         self.assertEqual(len(same), 1)
-        self.assertEqual(same[0]["channel"], "Company Man")
+        self.assertEqual(same[0]["channel"], "Sample Channel")
         self.assertIn("watch?v=s1", same[0]["url"])
         quiet = comment_report([{
             "title": "How much it actually costs to own a Subway",
@@ -693,12 +693,12 @@ class ResearchTests(unittest.TestCase):
             if request["kind"] == "youtube.channelSearch":
                 return {"channels": [
                     {"channel_id": "UCwrong", "channel_title": "companyman"},
-                    {"channel_id": "UCright", "channel_title": "Company Man"},
+                    {"channel_id": "UCright", "channel_title": "Sample Channel"},
                 ]}
             if request["kind"] == "youtube.channels":
                 return {"channels": [
                     {"channel_id": "UCwrong", "channel_title": "companyman", "uploads": "UUwrong", "subscribers": 10},
-                    {"channel_id": "UCright", "channel_title": "Company Man", "uploads": "UUright", "subscribers": 1000},
+                    {"channel_id": "UCright", "channel_title": "Sample Channel", "uploads": "UUright", "subscribers": 1000},
                 ]}
             if request["kind"] == "youtube.playlist":
                 return {"ids": ["abc"]}
@@ -706,10 +706,10 @@ class ResearchTests(unittest.TestCase):
                 return {"videos": [{"video_id": "abc", "title": "Why the stores failed", "description": "store count", "views": 10}]}
             return {}
 
-        videos, stopped = collect_channel_uploads(["Company Man"], Quota(0), transport, {})
+        videos, stopped = collect_channel_uploads(["Sample Channel"], Quota(0), transport, {})
         self.assertFalse(stopped)
         self.assertEqual(videos[0]["video_id"], "abc")
-        self.assertEqual(videos[0]["channel_title"], "Company Man")
+        self.assertEqual(videos[0]["channel_title"], "Sample Channel")
         self.assertNotIn("youtube.search", calls)
         self.assertIn("youtube.playlist", calls)
 
@@ -756,7 +756,7 @@ class ResearchTests(unittest.TestCase):
         def transport(request):
             calls.append(request["kind"])
             if request["kind"] == "youtube.channel":
-                return {"channel_id": "UC1", "channel_title": "Company Man", "uploads": "UU1"}
+                return {"channel_id": "UC1", "channel_title": "Sample Channel", "uploads": "UU1"}
             if request["kind"] == "youtube.playlist":
                 page = request.get("page_token") or "0"
                 start = int(page) * 50
@@ -864,7 +864,7 @@ class ResearchTests(unittest.TestCase):
         def transport(request):
             calls.append(request["kind"])
             if request["kind"] == "youtube.channel":
-                return {"channel_id": "UC_Z", "channel_title": "Real Numbers HQ", "uploads": "UUZ"}
+                return {"channel_id": "UC_Z", "channel_title": "Sample Two", "uploads": "UUZ"}
             if request["kind"] == "youtube.playlist":
                 self.assertFalse(request.get("page_token"))
                 return {"ids": ["v" + str(index) for index in range(29)], "next_page_token": ""}

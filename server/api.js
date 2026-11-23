@@ -2,7 +2,9 @@ import { mkdirSync, readFileSync, rmSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { writeBackup } from "./backup.js";
 import { database, databaseFile, addStat, checkPastedLink, ignoreWinner, importBrowserTools, importLocal, logEvent, readState, researchJob, restoreWinner, reviewFinding, saveSplit, setCadence, setDay, setFactCheck, setFindingUrl, setNiche, setNumbersInputs, setPerformance, setQueue, setStatus, setVideoSettings, setWeights, startResearch } from "./db.js";
-import { allowsPasscode, loadPasscode, researchHeaders } from "./passcode.js";
+import { copy } from "../src/copy.js";
+import { clientPlace, reviewLogin } from "./login-limit.js";
+import { loadPasscode, researchHeaders } from "./passcode.js";
 
 function plainRow(row) {
   if (!row) return null;
@@ -37,17 +39,31 @@ export async function handleApi(req, res) {
   const url = new URL(req.url, "http://localhost");
   const path = url.pathname;
   if (!path.startsWith("/api/")) return false;
-  const allowed = allowsPasscode({
-    remoteAddress: req.socket?.remoteAddress,
-    header: req.headers["x-counter-notes-passcode"],
-    expected: loadPasscode()
-  });
-  if (!allowed) {
-    send(res, 401, { error: "Passcode required.", code: "PASSCODE" });
+  const demo = process.env.COUNTER_NOTES_DEMO === "1";
+  const method = req.method || "GET";
+  if (!demo) {
+    const decision = reviewLogin({
+      place: clientPlace(req.headers, req.socket?.remoteAddress),
+      header: req.headers["x-counter-notes-passcode"],
+      expected: loadPasscode()
+    });
+    if (!decision.ok) {
+      send(res, decision.status, {
+        error: decision.code === "LOCKED" ? copy.locked : "Passcode required.",
+        code: decision.code
+      });
+      return true;
+    }
+  }
+  if (demo && method !== "GET") {
+    if (path === "/api/import-local" || path === "/api/import-tools") {
+      send(res, 200, await readState(await database()));
+      return true;
+    }
+    send(res, 403, { error: copy.demoReadOnly, code: "DEMO" });
     return true;
   }
   const db = await database();
-  const method = req.method || "GET";
 
   if (method === "GET" && path === "/api/state") {
     send(res, 200, await readState(db));

@@ -3,6 +3,7 @@ import test from "node:test";
 import { importLocal, openDatabase, readState, saveSplit, setFindingUrl, setStatus } from "./db.js";
 import { findingsForTopic, readyBlockReason } from "./numbers.js";
 import { allowsPasscode } from "./passcode.js";
+import { BLOCK_MS, FAIL_WINDOW_MS, resetLoginLimits, reviewLogin } from "./login-limit.js";
 import { topicsFromBlueprint } from "./seed.js";
 import { isUnverified } from "../src/status.js";
 
@@ -73,6 +74,31 @@ test("the passcode is required on every address, including this computer", () =>
   assert.equal(allowsPasscode({ remoteAddress: "192.168.1.20", header: "nope", expected: "secret" }), false);
   assert.equal(allowsPasscode({ remoteAddress: "127.0.0.1", header: "secret", expected: "secret" }), true);
   assert.equal(allowsPasscode({ header: "secret", expected: "" }), false);
+});
+
+test("five wrong passwords block one place for 15 minutes, then the right password works", () => {
+  resetLoginLimits();
+  const start = Date.parse("2026-11-23T12:00:00Z");
+  for (let index = 0; index < 4; index += 1) {
+    const miss = reviewLogin({ place: "203.0.113.8", header: "wrong", expected: "secret", now: start + index });
+    assert.equal(miss.status, 401);
+  }
+  const fifth = reviewLogin({ place: "203.0.113.8", header: "wrong", expected: "secret", now: start + 4 });
+  assert.equal(fifth.status, 429);
+  assert.equal(fifth.code, "LOCKED");
+  const during = reviewLogin({ place: "203.0.113.8", header: "secret", expected: "secret", now: start + BLOCK_MS - 1 });
+  assert.equal(during.status, 429);
+  const other = reviewLogin({ place: "203.0.113.9", header: "secret", expected: "secret", now: start + 5 });
+  assert.equal(other.ok, true);
+  const later = reviewLogin({ place: "203.0.113.8", header: "secret", expected: "secret", now: start + BLOCK_MS + 4 });
+  assert.equal(later.ok, true);
+  resetLoginLimits();
+  const old = reviewLogin({ place: "203.0.113.8", header: "wrong", expected: "secret", now: start });
+  assert.equal(old.status, 401);
+  const again = reviewLogin({ place: "203.0.113.8", header: "wrong", expected: "secret", now: start + FAIL_WINDOW_MS + 1 });
+  assert.equal(again.status, 401);
+  const blank = reviewLogin({ place: "203.0.113.8", header: "", expected: "secret", now: start });
+  assert.equal(blank.status, 401);
 });
 
 test("a series is stored and a single video stores no parts", async () => {
